@@ -111,7 +111,8 @@ exports.deleteSection = async (req, res) => {
         message: "Section Id not found",
       });
     }
-
+    //TODO : do we need to delete the section from
+    // course schema
     await Section.findByIdAndDelete({ _id: sectionID });
 
     return res.status(200).json({
