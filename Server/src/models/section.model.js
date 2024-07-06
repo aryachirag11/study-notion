@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+const Course = require("./course.model");
 
-const subsectionSchema = new mongoose.Schema({
+const sectionSchema = new mongoose.Schema({
   sectionName: {
     type: String,
   },
@@ -12,5 +13,16 @@ const subsectionSchema = new mongoose.Schema({
     },
   ],
 });
+sectionSchema.pre("remove", async function (next) {
+  try {
+    await Course.updateMany(
+      { courseContent: this._id },
+      { $pull: { courseContent: this._id } }
+    );
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
-module.exports = mongoose.model("SubSection", subsectionSchema);
+module.exports = mongoose.model("Section", sectionSchema);
