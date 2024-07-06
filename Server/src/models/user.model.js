@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Course = require("./course.model");
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -66,6 +67,18 @@ const userSchema = new mongoose.Schema({
       ref: "CourseProgress",
     },
   ],
+});
+
+userSchema.pre("remove", async function (next) {
+  try {
+    await Course.updateMany(
+      { studentsEnrolled: this._id },
+      { $pull: { studentsEnrolled: this._id } }
+    );
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = mongoose.model("User", userSchema);

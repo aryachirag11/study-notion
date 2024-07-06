@@ -69,9 +69,13 @@ exports.deleteAccount = async (res, req) => {
     //delete profile
     const prfileID = userDetails.additionalDetails;
     await Profile.findByIdAndDelete(prfileID);
-    //TODO : unenroll user from all courses
+    //it is necessary to ensure referential integrity//cascading delete
+    //mongoDB doesn't have any in-built operations to perform it;
+
     //user delete
+    //a pre middleware fucntion will remove user from enrolled courses
     await User.findByIdAndDelete(userID);
+
     //return res
     //TODO : how to schedule a request for  later in time
     //CRON job : what??
