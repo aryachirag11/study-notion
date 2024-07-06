@@ -1,6 +1,6 @@
-const Tag = require("../models/tag.model");
+const Category = require("../models/category.model");
 
-exports.createTag = async (req, res) => {
+exports.createCategory = async (req, res) => {
   try {
     //fetch data
     const { name, description } = req.body;
@@ -12,37 +12,40 @@ exports.createTag = async (req, res) => {
       });
     }
     //create tag object
-    const tagDetails = await Tag.create({
+    const categoryDetails = await Category.create({
       name: name,
       description: description,
     });
-    if (!tagDetails) {
+    if (!categoryDetails) {
       return res.status(500).json({
         success: false,
-        message: "Saving tag details failed",
+        message: "Saving category details failed",
       });
     }
 
     //return response
     return res.status(200).json({
       success: true,
-      tags: tagDetails,
-      message: "Tag details saved successfully",
+      tags: categoryDetails,
+      message: "Category details saved successfully",
     });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       success: false,
-      message: "Error in creating tag" + error.message,
+      message: "Error in creating category" + error.message,
     });
   }
 };
 
-exports.getAllTags = async (req, res) => {
+exports.getAllCategories = async (req, res) => {
   try {
-    const allTags = await Tag.find({}, { name: true, description: true });
+    const allCategories = await Category.find(
+      {},
+      { name: true, description: true }
+    );
 
-    if (!allTags) {
+    if (!allCategories) {
       return res.status(402).json({
         success: false,
         message: "Error while getting from DB",
@@ -52,13 +55,13 @@ exports.getAllTags = async (req, res) => {
     //return res
     return res.status(200).json({
       success: true,
-      tags: allTags,
-      message: "All tags fetched successfully",
+      tags: allCategories,
+      message: "All categories fetched successfully",
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Error in getting all tags" + error.message,
+      message: "Error in getting all categories" + error.message,
     });
   }
 };
