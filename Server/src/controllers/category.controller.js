@@ -65,3 +65,42 @@ exports.getAllCategories = async (req, res) => {
     });
   }
 };
+
+exports.categoryPageDetails = async (req, res) => {
+  try {
+    //get the categoryID
+    const { categoryID } = req.body;
+    //get all courses corresponding to the category
+    const selectedCategory = await Category.findById(categoryID)
+      .populate("courses")
+      .exec();
+    //validate the category
+    if (!selectedCategory) {
+      return res.status(402).json({
+        success: false,
+        message: "Course not found for the specified category",
+      });
+    }
+    //get courses from different category
+    const differentCategoryCourses = await Category.find({
+      _id: { $ne: categoryID },
+    })
+      .populate("courses")
+      .exec();
+    //get top selling course
+    // const topSellingCourses = await Courses
+    return res.status(200).json({
+      success: true,
+      message: " Courses fetched successfully for all categories",
+      selectedCategory: selectedCategory,
+      differentCategoryCourses: differentCategoryCourses,
+      topSellingCourses: topSellingCourses,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to load categoryPage :: Internal Server Error",
+    });
+  }
+};
