@@ -143,3 +143,52 @@ exports.getAllCourses = async (res, req) => {
     });
   }
 };
+
+exports.getCourseDetails = async (req, res) => {
+  try {
+    //fetch data
+    const { courseID } = req.body;
+    //validate
+    if (!courseID) {
+      return res.status(403).json({
+        success: false,
+        message: "CourseID is required",
+      });
+    }
+    //find course and populate all fields
+    const courseDetails = await Course.findById({ _id: courseID })
+      .populate({
+        path: "instructor",
+        populate: {
+          path: "additionalDetails",
+        },
+      })
+      .populate(category)
+      .populate("ratingAndReview")
+      .populate({
+        path: "courseContent",
+        populate: {
+          path: "subSection",
+        },
+      })
+      .exce();
+    if (!courseDetails) {
+      return res.status(400).json({
+        success: false,
+        message: `Could not find course details with id ${courseDetails}.`,
+      });
+    }
+    //return res
+    return res.status(200).json({
+      success: true,
+      message: `Course deatils were successfully fetched`,
+      courseDetails: courseDetails,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch course deatils, some internal error occurred",
+    });
+  }
+};
