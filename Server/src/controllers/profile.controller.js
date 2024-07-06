@@ -1,51 +1,64 @@
 const Profile = require("../models/profile.model");
 const User = require("../models/user.model");
 
-exports.updateProfile = async (res, req) => {
+exports.updateProfile = async (req, res) => {
   try {
-    //fetch data
+    // Destructure data from request body
     const {
       gender,
-      dateOfBirth = "",
+      dateOfBirth = "", // Default value if not provided
       bio = "",
       contactNumber,
       skills = [],
       socialProfiles = [],
-      protfolio = "",
+      portfolio = "", // Corrected typo in variable name
     } = req.body;
-    //get userID
+
+    // Get user ID from authenticated request
     const userID = req.user.id;
-    //validate
+
+    // Validate user ID
     if (!userID) {
       return res.status(404).json({
         success: false,
-        message: "unable to get user id",
+        message: "Unable to get user ID",
       });
     }
-    //find prfile
-    const userDetails = await User.findById({ __dirname });
+
+    // Find user details to get profile ID (assuming additionalDetails holds profile ID)
+    const userDetails = await User.findById(userID);
+    if (!userDetails) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
     const profileID = userDetails.additionalDetails;
-    //update profile
+
+    // Update profile in database
     const profileDetails = await Profile.findByIdAndUpdate(
-      { _id: profileID },
+      profileID,
       {
         gender: gender,
-        dateOfbirth: dateOfBirth,
+        dateOfBirth: dateOfBirth,
         bio: bio,
         contactNumber: contactNumber,
         skills: skills,
         socialProfiles: socialProfiles,
-        portfolio: protfolio,
-      }
+        portfolio: portfolio,
+      },
+      { new: true } // To return the updated document
     );
-    //return res
+
+    // Return success response with updated profile details
     return res.status(200).json({
       success: true,
-      message: " profile updated successfully",
+      message: "Profile updated successfully",
       profile: profileDetails,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error updating profile:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
