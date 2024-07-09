@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 const User = require("../models/user");
 
 exports.authenticateUser = async (req, res, next) => {
@@ -17,7 +18,7 @@ exports.authenticateUser = async (req, res, next) => {
       });
     }
     //verify token
-    const decodedToken = jwt.verify(incomingToken, process.env.JWT_SECRET_KEY);
+    const decodedToken = jwt.verify(incomingToken, process.env.JWT_SECRET);
     if (!decodedToken) {
       return res.status(401).json({
         success: false,
@@ -48,7 +49,7 @@ exports.authenticateUser = async (req, res, next) => {
 
 exports.verifyStudent = (req, res, next) => {
   try {
-    if (req.user?.role !== "Student") {
+    if (req.user?.accountType !== "Student") {
       return res.status(401).json({
         success: false,
         message: "Secured route for students only",
@@ -65,7 +66,7 @@ exports.verifyStudent = (req, res, next) => {
 
 exports.verifyInstructor = (req, res, next) => {
   try {
-    if (req.user?.role !== "Instructor") {
+    if (req.user?.accountType !== "Instructor") {
       return res.status(401).json({
         success: false,
         message: "Secured route for Instructor only",
@@ -82,7 +83,7 @@ exports.verifyInstructor = (req, res, next) => {
 
 exports.verifyAdmin = (req, res, next) => {
   try {
-    if (req.user?.role !== "Admin") {
+    if (req.user?.accountType !== "Admin") {
       return res.status(401).json({
         success: false,
         message: "Secured route for admins only",

@@ -76,7 +76,7 @@ exports.categoryPageDetails = async (req, res) => {
       .exec();
     //validate the category
     if (!selectedCategory) {
-      return res.status(402).json({
+      return res.status(404).json({
         success: false,
         message: "Course not found for the specified category",
       });
@@ -94,7 +94,7 @@ exports.categoryPageDetails = async (req, res) => {
       message: " Courses fetched successfully for all categories",
       selectedCategory: selectedCategory,
       differentCategoryCourses: differentCategoryCourses,
-      topSellingCourses: topSellingCourses,
+      // topSellingCourses: topSellingCourses,
     });
   } catch (error) {
     console.log(error);

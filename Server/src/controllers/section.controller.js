@@ -36,7 +36,6 @@ exports.createSection = async (req, res) => {
         path: "courseContent",
         populate: {
           path: "subSection",
-          model: "SubSection",
         },
       })
       .exec();
@@ -71,7 +70,7 @@ exports.updateSection = async (req, res) => {
 
     // Validation
     if (!sectionName || !sectionID) {
-      return res.status(400).json({
+      return res.status(401).json({
         success: false,
         message: "Please provide a section name and a section ID",
       });

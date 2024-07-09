@@ -1,5 +1,6 @@
 const Profile = require("../models/profile.model");
 const User = require("../models/user.model");
+const { uploadOnCloudinary } = require("../utils/cloudinaryUpload.util");
 
 exports.updateProfile = async (req, res) => {
   try {
@@ -80,8 +81,8 @@ exports.deleteAccount = async (res, req) => {
       });
     }
     //delete profile
-    const prfileID = userDetails.additionalDetails;
-    await Profile.findByIdAndDelete(prfileID);
+    const profileID = userDetails.additionalDetails;
+    await Profile.findByIdAndDelete(profileID);
     //it is necessary to ensure referential integrity//cascading delete
     //mongoDB doesn't have any in-built operations to perform it;
 
@@ -138,6 +139,59 @@ exports.getAllUserDetails = async (res, req) => {
       success: false,
       message: "Internal server error : failed to get user details",
       error: error.message,
+    });
+  }
+};
+exports.updateDisplayPicture = async (req, res) => {
+  try {
+    const displayPicture = req.files.displayPicture;
+    const userId = req.user.id;
+    const image = await uploadOnCloudinary(
+      displayPicture,
+      process.env.FOLDER_NAME,
+      1000,
+      1000
+    );
+    console.log(image);
+    const updatedProfile = await User.findByIdAndUpdate(
+      { _id: userId },
+      { image: image.secure_url },
+      { new: true }
+    );
+    res.send({
+      success: true,
+      message: `Image Updated successfully`,
+      data: updatedProfile,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+exports.getEnrolledCourses = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const userDetails = await User.findOne({
+      _id: userId,
+    })
+      .populate("courses")
+      .exec();
+    if (!userDetails) {
+      return res.status(400).json({
+        success: false,
+        message: `Could not find user with id: ${userDetails}`,
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      data: userDetails.courses,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
     });
   }
 };

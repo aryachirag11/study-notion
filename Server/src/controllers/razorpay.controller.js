@@ -5,6 +5,7 @@ const mailSender = require("../utils/mailSender.util");
 const {
   courseEnrollmentEmail,
 } = require("../mail/templates/courseEnrollment.template");
+const { default: mongoose } = require("mongoose");
 
 exports.capturePayment = async (req, res) => {
   try {
@@ -90,7 +91,7 @@ exports.verifySignature = async (req, res) => {
 
   const digest = shaSum.digest("hex");
 
-  if (signature === shaSum) {
+  if (signature === digest) {
     console.log("Payment authorized");
 
     const { courseID, userID } = req.body.payload.payment.entity.notes;
@@ -128,7 +129,7 @@ exports.verifySignature = async (req, res) => {
         "Congratulations, welcome aboard",
         "You are enrolled in the coourse successfully, thank you for your purscription"
       );
-
+      console.log(emailResponse);
       return res.status(200).json({
         success: true,
         message: "User enrolled in the course successfully,",

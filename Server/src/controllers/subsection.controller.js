@@ -1,12 +1,12 @@
 const Section = require("../models/subsection.model");
-const Subsection = require("../models/section.model");
-const uploadOnCloudinary = require("../utils/cloudinaryUpload.util");
+const SubSection = require("../models/section.model");
+const { uploadOnCloudinary } = require("../utils/cloudinaryUpload.util");
 
 exports.createSubsection = async (req, res) => {
   try {
     //fetch data
-    const { sectionID, title, timeDuration, description } = req.body;
-    if (!sectionID || !title || !timeDuration || !description) {
+    const { sectionID, title, timeDuration } = req.body;
+    if (!sectionID || !title || !description) {
       return res.status(404).json({
         success: false,
         message: " Please enter all required fields",
@@ -21,6 +21,7 @@ exports.createSubsection = async (req, res) => {
         message: "Video file is missing",
       });
     }
+    console.log(video);
     //upload video on cloudinary
     const uploadVideo = await uploadOnCloudinary(
       videoFile,
@@ -32,10 +33,11 @@ exports.createSubsection = async (req, res) => {
         message: "Video file upload on cloudinary failed",
       });
     }
+    console.log(uploadVideo);
     //create a subsection
     const newSubsection = await Subsection.create({
       title: title,
-      timeDuration: timeDuration,
+      timeDuration: `${uploadVideo.duration}`,
       description: description,
       videoUrl: uploadVideo.secure_url,
     });
@@ -81,8 +83,8 @@ exports.createSubsection = async (req, res) => {
 //update subsection
 exports.updateSubSection = async (req, res) => {
   try {
-    const { title, timeDuration, description, videoUrl, subsectionID } =
-      req.body;
+    const { title, description, subsectionID } = req.body;
+    const subSection = await SubSection.findById(subsectionID);
 
     // Validation
     if (!subsectionID) {
@@ -93,25 +95,28 @@ exports.updateSubSection = async (req, res) => {
     }
 
     // Prepare update object with provided fields
-    const updateFields = {};
-    if (title) updateFields.title = title;
-    if (timeDuration) updateFields.timeDuration = timeDuration;
-    if (description) updateFields.description = description;
-    if (videoUrl) updateFields.videoUrl = videoUrl;
+    // const updateFields = {};
+    if (title) subSection.title = title;
+    if (description) subSection.description = description;
+    if (req.files && req.files.video !== undefined) {
+      const video = req.files.video;
+      const uploadDetails = await uploadOnCloudinary(
+        video,
+        process.env.FOLDER_NAME
+      );
+      subSection.videoUrl = uploadDetails.secure_url;
+      subSection.timeDuration = `${uploadDetails.duration}`;
+    }
 
     // Update SubSection
-    const updatedSubSection = await SubSection.findByIdAndUpdate(
-      subsectionID,
-      updateFields,
-      { new: true } // Return the updated document
-    );
+    await subSection.save();
 
-    if (!updatedSubSection) {
-      return res.status(404).json({
-        success: false,
-        message: "SubSection not found or failed to update",
-      });
-    }
+    // if (!updatedSubSection) {
+    //   return res.status(404).json({
+    //     success: false,
+    //     message: "SubSection not found or failed to update",
+    //   });
+    // }
 
     // Return success response
     return res.status(200).json({
@@ -130,7 +135,7 @@ exports.updateSubSection = async (req, res) => {
 //delete section
 exports.deleteSubSection = async (req, res) => {
   try {
-    const subsectionID = req.params.id; // Assuming SubSection ID is passed as a route parameter
+    const subsectionID = req.body; // Assuming SubSection ID is passed as a route parameter
 
     // Validation
     if (!subsectionID) {

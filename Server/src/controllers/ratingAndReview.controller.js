@@ -1,23 +1,23 @@
 const RatingAndReview = require("../models/ratingandreviw.model");
 const Course = require("../models/course.model");
-const { default: mongoose } = require("mongoose");
+const { mongo, default: mongoose } = require("mongoose");
 
 //create rating
 exports.createRating = async (req, res) => {
   try {
     //get user id
-    const { userID } = req.user.id;
+    const userID = req.user.id;
     //fetch data from req body
     const { rating, review, courseID } = req.body;
     //check if user is enrolled or not
-    const courseDetails = await Course.findById9({
+    const courseDetails = await Course.findById({
       _id: courseID,
       studentsEnrolled: { $elemMatch: { $eq: userID } },
     });
     if (!courseDetails) {
       return res.status(404).json({
         success: false,
-        message: "Course not found",
+        message: "Student is not enrolled in the course",
       });
     }
     //check if user has already reviewed
@@ -26,7 +26,7 @@ exports.createRating = async (req, res) => {
       course: courseID,
     });
     if (alreadyReviewedCourse) {
-      return res.status(402).json({
+      return res.status(403).json({
         success: false,
         message: "Course already reviewed by the user",
       });
@@ -96,7 +96,7 @@ exports.getAvgRating = async (req, res) => {
       {
         $group: {
           _id: null,
-          averageRating: { $avg: "rating" },
+          averageRating: { $avg: "$rating" },
         },
       },
     ]);
@@ -127,11 +127,11 @@ exports.getAllRatingAndReview = async (req, res) => {
     const { courseID = "" } = req.body;
     if (courseID) {
     } else {
-      const allReview = await RatingAndReview.findOne({})
+      const allReview = await RatingAndReview.find({})
         .sort({ rating: "desc" })
         .populate({
           path: "user",
-          select: "firstName lastName avatar",
+          select: "firstName lastName email avatar",
         })
         .populate({
           path: "course",

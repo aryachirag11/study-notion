@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
     index: true,
   },
-  fisrtName: {
+  firstName: {
     type: String,
     required: true,
     trim: true,

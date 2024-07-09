@@ -1,6 +1,7 @@
 const User = require("../models/user.model");
 const mailSender = require("../utils/mailSender.util");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 
 exports.resetPasswordToken = async (req, res) => {
   try {
@@ -18,18 +19,18 @@ exports.resetPasswordToken = async (req, res) => {
     if (!existedUser) {
       return res.status(403).json({
         success: false,
-        message: "User does not exist",
+        message: `This Email: ${email} is not Registered With Us Enter a Valid Email`,
       });
     }
 
     //generate reset token
-    const token = crypto.randomUUID();
+    const token = crypto.randomBytes(20).toString("hex");
     //update token in db
     const updatedUser = await User.findOneAndUpdate(
-      { email },
+      { email: email },
       {
         resetPasswordToken: token,
-        resetPasswordExpiration: Date.now() + 5 * 60 * 1000,
+        resetPasswordExpiration: Date.now() + 3600000,
       },
       {
         new: true,
@@ -39,7 +40,11 @@ exports.resetPasswordToken = async (req, res) => {
     //create url
     const url = `http://localhost:3000/update-password/${token}`;
     //send reset link
-    await mailSender(email, "Password reset", `Password reset link : ${url}`);
+    await mailSender(
+      email,
+      "Password Reset",
+      `Your Link for email verification is ${url}. Please click this url to reset your password.`
+    );
 
     return res.status(200).json({
       success: true,
@@ -62,7 +67,7 @@ exports.resetPassword = async (req, res) => {
     if (newPassword !== confirmNewPassword) {
       return res.status(402).json({
         success: false,
-        message: `passwword mismatch`,
+        message: "Password and Confirm Password Does not Match",
       });
     }
     //get user details
@@ -74,10 +79,10 @@ exports.resetPassword = async (req, res) => {
       });
     }
     //check expiration
-    if (user.resetPasswordExpiration < Date.now()) {
+    if (!(userDetails.resetPasswordExpires > Date.now())) {
       return res.status(403).json({
         success: false,
-        message: "Link is expired",
+        message: "Token is Expired, Please Regenerate Your Token",
       });
     }
 

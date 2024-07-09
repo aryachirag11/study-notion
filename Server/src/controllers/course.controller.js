@@ -1,13 +1,22 @@
 const Course = require("../models/course.model ");
 const Category = require("../models/category.model");
 const User = require("../models/user.model");
-const uploadOnCloudinary = require("../utils/imageUpload.util");
+const { uploadOnCloudinary } = require("../utils/imageUpload.util");
 
 exports.createCourse = async (req, res) => {
   try {
+    const userID = req.user.id;
     //fetch data
-    const { courseName, courseDescription, whatYouWillLearn, price, category } =
-      req.body;
+    const {
+      courseName,
+      courseDescription,
+      whatYouWillLearn,
+      price,
+      tag,
+      category,
+      status,
+      instructions,
+    } = req.body;
 
     //get thumbnail
     const thumbnail = req.files.thumbnailImage;
@@ -18,6 +27,8 @@ exports.createCourse = async (req, res) => {
       !courseDescription ||
       !whatYouWillLearn ||
       !price ||
+      !tag ||
+      !thumbnail ||
       !category
     ) {
       return res.status(400).json({
@@ -25,50 +36,58 @@ exports.createCourse = async (req, res) => {
         message: "All fields are required",
       });
     }
-    //check instructor
-    const userID = req.user._id;
-    const instructorDetails = await User.findById(userID);
+    if (!status || status === undefined) {
+      status = "Draft";
+    }
+    // Check if the user is an instructor
+    const instructorDetails = await User.findById(userID, {
+      accountType: "Instructor",
+    });
+
     if (!instructorDetails) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "Instructor Details Not Found",
       });
     }
-    //check for category
-    const categoryDetails = await Tag.findById(tag);
-    if (!tagDetails) {
+    // Check if the category given is valid
+    const categoryDetails = await Category.findById(category);
+    if (!categoryDetails) {
       return res.status(404).json({
         success: false,
-        message: "Tag not found",
+        message: "Category Details Not Found",
       });
     }
     //upload on cloudinary
     const thumbnailImage = await uploadOnCloudinary(
-      thumbnail.tempFilePath,
+      thumbnail,
       process.env.FOLDER_NAME
     );
 
-    if (!thumbnailImage) {
-      return res.status(402).json({
-        success: false,
-        message: "Image upload on cloudinary failed ",
-      });
-    }
+    // if (!thumbnailImage) {
+    //   return res.status(402).json({
+    //     success: false,
+    //     message: "Image upload on cloudinary failed ",
+    //   });
+    // }
 
     //create enrty in DB
     const newCourse = await Course.create({
       courseName,
       courseDescription,
       intructor: instructorDetails._id,
-      whatYouWillLearn,
+      whatYouWillLearn: whatYouWillLearn,
       price,
-      tag: categoryDetails._id,
+      tag: tag,
+      category: categoryDetails._id,
       thumbnail: thumbnailImage.secure_url,
+      status: status,
+      instructions: instructions,
     });
 
     //add course to instructor schema
-    await User.findById(
-      { _id: instructor._id },
+    await User.findByIdAndUpdate(
+      { _id: instructorDetails._id },
       {
         $push: {
           courses: newCourse._id,
@@ -150,7 +169,7 @@ exports.getCourseDetails = async (req, res) => {
     const { courseID } = req.body;
     //validate
     if (!courseID) {
-      return res.status(403).json({
+      return res.status(401).json({
         success: false,
         message: "CourseID is required",
       });
@@ -163,7 +182,7 @@ exports.getCourseDetails = async (req, res) => {
           path: "additionalDetails",
         },
       })
-      .populate(category)
+      .populate("category")
       .populate("ratingAndReview")
       .populate({
         path: "courseContent",
@@ -175,7 +194,7 @@ exports.getCourseDetails = async (req, res) => {
     if (!courseDetails) {
       return res.status(400).json({
         success: false,
-        message: `Could not find course details with id ${courseDetails}.`,
+        message: `Could not find course details with id ${courseID}.`,
       });
     }
     //return res
