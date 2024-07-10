@@ -1,7 +1,7 @@
-const Course = require("../models/course.model ");
+const Course = require("../models/course.model");
 const Category = require("../models/category.model");
 const User = require("../models/user.model");
-const { uploadOnCloudinary } = require("../utils/imageUpload.util");
+const { uploadOnCloudinary } = require("../utils/cloudinaryUpload.util");
 
 exports.createCourse = async (req, res) => {
   try {
@@ -19,6 +19,7 @@ exports.createCourse = async (req, res) => {
     } = req.body;
 
     //get thumbnail
+    // console.log(req.files.thumbnailImage);
     const thumbnail = req.files.thumbnailImage;
 
     //validation
@@ -36,9 +37,9 @@ exports.createCourse = async (req, res) => {
         message: "All fields are required",
       });
     }
-    if (!status || status === undefined) {
-      status = "Draft";
-    }
+    // if (!status || status === undefined) {
+    //   status = "Draft";
+    // }
     // Check if the user is an instructor
     const instructorDetails = await User.findById(userID, {
       accountType: "Instructor",
@@ -60,22 +61,22 @@ exports.createCourse = async (req, res) => {
     }
     //upload on cloudinary
     const thumbnailImage = await uploadOnCloudinary(
-      thumbnail,
+      thumbnail.tempFilePath,
       process.env.FOLDER_NAME
     );
 
-    // if (!thumbnailImage) {
-    //   return res.status(402).json({
-    //     success: false,
-    //     message: "Image upload on cloudinary failed ",
-    //   });
-    // }
+    if (!thumbnailImage) {
+      return res.status(402).json({
+        success: false,
+        message: "Image upload on cloudinary failed ",
+      });
+    }
 
     //create enrty in DB
     const newCourse = await Course.create({
       courseName,
       courseDescription,
-      intructor: instructorDetails._id,
+      instructor: instructorDetails._id,
       whatYouWillLearn: whatYouWillLearn,
       price,
       tag: tag,
@@ -190,7 +191,7 @@ exports.getCourseDetails = async (req, res) => {
           path: "subSection",
         },
       })
-      .exce();
+      .exec();
     if (!courseDetails) {
       return res.status(400).json({
         success: false,

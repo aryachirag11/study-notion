@@ -6,7 +6,7 @@ const crypto = require("crypto");
 exports.resetPasswordToken = async (req, res) => {
   try {
     //fetch email
-    const { email } = req.body.email;
+    const email = req.body.email;
     if (!email) {
       return res.status(402).json({
         success: false,
@@ -79,7 +79,7 @@ exports.resetPassword = async (req, res) => {
       });
     }
     //check expiration
-    if (!(userDetails.resetPasswordExpires > Date.now())) {
+    if (!(user.resetPasswordExpiration > Date.now())) {
       return res.status(403).json({
         success: false,
         message: "Token is Expired, Please Regenerate Your Token",

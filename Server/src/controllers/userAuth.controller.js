@@ -26,20 +26,19 @@ exports.sendOTP = async (req, res) => {
     }
     //TODO : improve this logic
     //generate otp
-    let otp = otpGenerator.generate(6, {
-      upperCaseAlphabet: false,
-      lowerCaseAlphabet: false,
+    var otp = otpGenerator.generate(6, {
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
       specialChars: false,
     });
-    //check if otp is unique
-    let result = await OTP.findOne({ otp: otp });
+    const result = await OTP.findOne({ otp: otp });
+    console.log("Result is Generate OTP Func");
+    console.log("OTP", otp);
+    console.log("Result", result);
     while (result) {
       otp = otpGenerator.generate(6, {
-        upperCaseAlphabet: false,
-        lowerCaseAlphabet: false,
-        specialChars: false,
+        upperCaseAlphabets: false,
       });
-      result = await OTP.findOne({ otp: otp });
     }
     //create a playlaod for otp
     const otpPlaylaod = { email, otp };
@@ -121,8 +120,8 @@ exports.userSignup = async (req, res) => {
         success: false,
         message: "No OTP found associated with users",
       });
-    } else if (otp !== mostRecentOTP[0].otp) {
-      return res.status(400).josn({
+    } else if (otp !== mostRecentOTP.otp) {
+      return res.status(400).json({
         success: false,
         message: "Wrong OTP, mismatch",
       });
@@ -155,7 +154,8 @@ exports.userSignup = async (req, res) => {
       additionalDetails: profileDeatils._id,
       avatar: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
     });
-    if (!user) {
+    const createdUser = await User.findById(user._id).select("-password");
+    if (!createdUser) {
       return res.status(500).json({
         success: false,
         message: "Failed to store profile in DB",
@@ -164,7 +164,7 @@ exports.userSignup = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "User registered successfully",
-      user: user,
+      user: createdUser,
     });
   } catch (error) {
     console.log(error);
@@ -221,9 +221,9 @@ exports.userLogin = async (req, res) => {
     await existedUser.save();
 
     //get logged in user
-    const loggedInUser = await User.findById(existedUser._id).select(
-      "-password -accessToken"
-    );
+    const loggedInUser = await User.findById(existedUser._id)
+      .select("-password -accessToken")
+      .populate("additionalDetails");
     //cookie option
     const options = {
       httpOnly: true,

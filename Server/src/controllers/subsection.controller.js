@@ -1,11 +1,11 @@
-const Section = require("../models/subsection.model");
-const SubSection = require("../models/section.model");
+const Section = require("../models/section.model");
+const SubSection = require("../models/subsection.model");
 const { uploadOnCloudinary } = require("../utils/cloudinaryUpload.util");
 
 exports.createSubsection = async (req, res) => {
   try {
     //fetch data
-    const { sectionID, title, timeDuration } = req.body;
+    const { sectionID, title, description } = req.body;
     if (!sectionID || !title || !description) {
       return res.status(404).json({
         success: false,
@@ -21,25 +21,29 @@ exports.createSubsection = async (req, res) => {
         message: "Video file is missing",
       });
     }
-    console.log(video);
+    // console.log(video);
+    // console.log("Uplaoding video file on cloudinary");
+    // console.log(process.env.FOLDER_NAME);
     //upload video on cloudinary
-    const uploadVideo = await uploadOnCloudinary(
-      videoFile,
+    const uploadDetails = await uploadOnCloudinary(
+      video.tempFilePath,
       process.env.FOLDER_NAME
     );
-    if (!uploadVideo) {
+    // console.log("Video uploaded on cloudinary");
+
+    if (!uploadDetails) {
       return res.status(501).json({
         success: false,
         message: "Video file upload on cloudinary failed",
       });
     }
-    console.log(uploadVideo);
-    //create a subsection
-    const newSubsection = await Subsection.create({
+    // console.log(uploadDetails);
+    // console.log("create a subsection");
+    const newSubsection = await SubSection.create({
       title: title,
-      timeDuration: `${uploadVideo.duration}`,
+      timeDuration: `${uploadDetails.duration}`,
       description: description,
-      videoUrl: uploadVideo.secure_url,
+      videoUrl: uploadDetails.secure_url,
     });
     if (!newSubsection) {
       return res.status(501).json({
@@ -47,7 +51,7 @@ exports.createSubsection = async (req, res) => {
         message: "Falied to save subsection in Db",
       });
     }
-
+    // console.log("Updating section");
     const updatedSection = await Section.findByIdAndUpdate(
       { _id: sectionID },
       {
@@ -56,7 +60,7 @@ exports.createSubsection = async (req, res) => {
         },
       },
       { new: true }
-    );
+    ).populate("subSection");
     if (!updatedSection) {
       return res.staus(502).json({
         success: false,
@@ -73,7 +77,7 @@ exports.createSubsection = async (req, res) => {
     //add subsection to section
     //return res
   } catch (error) {
-    return res.staus(500).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to create subsection",
     });
@@ -122,7 +126,7 @@ exports.updateSubSection = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "SubSection updated successfully",
-      subsection: updatedSubSection,
+      subsection: subSection,
     });
   } catch (error) {
     console.error("Error updating SubSection:", error);

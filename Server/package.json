@@ -4,8 +4,7 @@
   "description": "Backend for StudyNotion",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon src/index.js"
   },
   "author": "Chirag Arya",
   "license": "ISC",

@@ -11,16 +11,15 @@ const mailSender = async (email, title, body) => {
     });
 
     let info = await transporter.sendMail({
-      from: "StudyNotion - by Chirag Arya",
+      from: "LearnSphere ||  - by Chirag Arya",
       to: `${email}`,
       subject: `${title}`,
       html: `${body}`,
     });
-
-    if (!info) return null;
-    console.log(info);
+    // console.log(info);
+    return info;
   } catch (error) {
-    console.error(error.message);
+    console.log(error.message);
   }
 };
 

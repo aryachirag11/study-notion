@@ -4,7 +4,7 @@ const User = require("../models/user.model");
 const mailSender = require("../utils/mailSender.util");
 const {
   courseEnrollmentEmail,
-} = require("../mail/templates/courseEnrollment.template");
+} = require("../mail/templates/courseEnrollmentEmail");
 const { default: mongoose } = require("mongoose");
 
 exports.capturePayment = async (req, res) => {

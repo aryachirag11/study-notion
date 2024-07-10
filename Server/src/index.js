@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 4000;
 
 //middlewares
 app.use(express.json());
-app.use(express.cookieParser());
+app.use(cookieParser());
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -35,10 +35,10 @@ app.use(
 cloudinaryConnect();
 
 //routes
-app.use("/api/v1/auth/", userRoutes);
-app.use("/api/v1/profile/", userprofileRoute);
-app.use("/api/v1/payment/", paymentRoute);
-app.use("/api/v1/course/", courseRoutes);
+app.use("/api/v1/auth", userRoutes);
+app.use("/api/v1/profile", userprofileRoute);
+app.use("/api/v1/payment", paymentRoute);
+app.use("/api/v1/course", courseRoutes);
 
 app.get("/", (req, res) => {
   return res.json({
@@ -47,6 +47,14 @@ app.get("/", (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`App listening on ${PORT}`);
-});
+database
+  .connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`App listening on ${PORT}`);
+    });
+  })
+  .catch(() => {
+    console.log("failed to connect to Db");
+    process.exit(1);
+  });

@@ -56,12 +56,7 @@ router.post("/createCourse", authenticateUser, verifyInstructor, createCourse);
 //Add a Section to a Course
 router.post("/addSection", authenticateUser, verifyInstructor, createSection);
 // Update a Section
-router.post(
-  "/updateSection",
-  authenticateUser,
-  verifyInstructor,
-  updateSection
-);
+router.put("/updateSection", authenticateUser, verifyInstructor, updateSection);
 // Delete a Section
 router.post(
   "/deleteSection",
@@ -70,7 +65,7 @@ router.post(
   deleteSection
 );
 // Edit Sub Section
-router.post(
+router.put(
   "/updateSubSection",
   authenticateUser,
   verifyInstructor,
@@ -80,7 +75,7 @@ router.post(
 router.post(
   "/deleteSubSection",
   authenticateUser,
-  isInstructor,
+  verifyInstructor,
   deleteSubSection
 );
 // Add a Sub Section to a Section
@@ -93,7 +88,7 @@ router.post(
 // Get all Registered Courses
 router.get("/getAllCourses", getAllCourses);
 // Get Details for a Specific Courses
-router.post("/getCourseDetails", getCourseDetails);
+router.get("/getCourseDetails", getCourseDetails);
 
 // ********************************************************************************************************
 //                                      Category routes (Only by Admin)

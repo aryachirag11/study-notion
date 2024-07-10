@@ -68,7 +68,7 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-exports.deleteAccount = async (res, req) => {
+exports.deleteAccount = async (req, res) => {
   try {
     //fetch data
     const userID = req.user.id;
@@ -107,9 +107,18 @@ exports.deleteAccount = async (res, req) => {
   }
 };
 
-exports.getAllUserDetails = async (res, req) => {
+exports.getAllUserDetails = async (req, res) => {
   try {
+    // console.log(
+    //   "-------------------------------------------------------------------------------------"
+    // );
+    // console.log();
+    // console.log(
+    //   "-------------------------------------------------------------------------------------"
+    // );
+    // console.log("req users : ", req.user);
     const userID = req.user.id;
+    // console.log(userID);
 
     if (!userID) {
       return res.status(402).json({
@@ -119,7 +128,8 @@ exports.getAllUserDetails = async (res, req) => {
     }
 
     const userDetails = await User.findById(userID)
-      .populate("additonalDetails")
+      .select("-password -accessToken")
+      .populate("additionalDetails")
       .exec();
     if (!userDetails) {
       return res.status(404).json({
@@ -144,24 +154,27 @@ exports.getAllUserDetails = async (res, req) => {
 };
 exports.updateDisplayPicture = async (req, res) => {
   try {
-    const displayPicture = req.files.displayPicture;
+    const newAvatar = req.files.displayPicture;
     const userId = req.user.id;
+    // console.log(req.user.id);
     const image = await uploadOnCloudinary(
-      displayPicture,
+      newAvatar.tempFilePath,
       process.env.FOLDER_NAME,
       1000,
       1000
     );
-    console.log(image);
     const updatedProfile = await User.findByIdAndUpdate(
       { _id: userId },
-      { image: image.secure_url },
+      { avatar: image.secure_url },
       { new: true }
+    );
+    const user = await User.findById(updatedProfile._id).select(
+      "-password -accessToken"
     );
     res.send({
       success: true,
       message: `Image Updated successfully`,
-      data: updatedProfile,
+      data: user,
     });
   } catch (error) {
     return res.status(500).json({

@@ -1,15 +1,17 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const User = require("../models/user");
+const User = require("../models/user.model");
 
 exports.authenticateUser = async (req, res, next) => {
   try {
     //extract token
     const incomingToken =
-      req.body?.accessToken ||
-      req.cookies?.accessToken ||
+      req.body.accessToken ||
+      req.cookies.accessToken ||
       req.header("Authorization").replace("Bearer ", "");
-
+    // console.log(req.body.accessToken);
+    // console.log(req.cookies.accessToken);
+    // console.log(req.header("Authorization").replace("Bearer ", ""));
     //check if token present
     if (!incomingToken) {
       return res.status(401).json({
@@ -25,9 +27,9 @@ exports.authenticateUser = async (req, res, next) => {
         message: "Invalid token format",
       });
     }
-
+    // console.log(decodedToken);
     // check if token is realted to some user
-    const user = await User.findById(decodedToken?.tokenPayload?.id).select(
+    const user = await User.findById(decodedToken?.id).select(
       "-password -accessToken"
     );
     if (!user) {
@@ -36,7 +38,14 @@ exports.authenticateUser = async (req, res, next) => {
         message: "user not found,  invalid token for the user",
       });
     }
+    // console.log(
+    //   "-------------------------------------------------------------------------------------"
+    // );
     req.user = user;
+    // console.log("req user : ", req.user);
+    // console.log(
+    //   "-------------------------------------------------------------------------------------"
+    // );
     next();
   } catch (error) {
     return res.status(401).json({
@@ -97,5 +106,3 @@ exports.verifyAdmin = (req, res, next) => {
     });
   }
 };
-
-export { authenticateUser, verifyStudent, verifyAdmin };
