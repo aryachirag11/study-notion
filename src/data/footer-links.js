@@ -1,3 +1,13 @@
+export const FooterLink1 = [
+  {
+    title: "Company",
+    links: [
+      { title: "About", link: "/about" },
+      { title: "Careers", link: "/careers" },
+      { title: "Affiliates", link: "/affiliates" },
+    ],
+  },
+];
 export const FooterLink2 = [
   {
     title: "Subjects",
@@ -43,13 +53,16 @@ export const FooterLink2 = [
   {
     title: "Career building",
     links: [
-        {title: "Career paths", link: "/career-paths"},
-        {title: "Career services", link: "/career-services"},
-        {title: "Interview prep", link: "/interview-prep"},
-        {title: "Professional certification", link: "/professional-certification"},
-        {title: "-", link: "/hi"},
-        {title: "Full Catalog", link: "/full-catalog"},
-        {title: "Beta Content", link: "/beta-content"}
-    ]
-  }
+      { title: "Career paths", link: "/career-paths" },
+      { title: "Career services", link: "/career-services" },
+      { title: "Interview prep", link: "/interview-prep" },
+      {
+        title: "Professional certification",
+        link: "/professional-certification",
+      },
+      { title: "-", link: "/hi" },
+      { title: "Full Catalog", link: "/full-catalog" },
+      { title: "Beta Content", link: "/beta-content" },
+    ],
+  },
 ];
