@@ -1,3 +1,8 @@
 .homepage_bg {
   background-image: url("../assets//Images/bghome.svg");
 }
+.shadow-item {
+  -webkit-box-shadow: 0px -26px 134px 0px rgba(8, 163, 163, 0.53);
+  -moz-box-shadow: 0px -26px 134px 0px rgba(8, 163, 163, 0.53);
+  box-shadow: 0px -26px 134px 0px rgba(8, 163, 163, 0.53);
+}

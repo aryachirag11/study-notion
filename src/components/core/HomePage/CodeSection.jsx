@@ -27,9 +27,9 @@ const CodeSection = ({
 
   return (
     <div
-      className={`w-11/12 h-fit flex ${
-        isFlexReverse ? "flex-row-reverse" : "flex-row"
-      } gap-20  items-center px-4`}
+      className={`w-11/12 md:h-fit flex flex-col ${
+        isFlexReverse ? "md:flex-row-reverse" : "md:flex-row"
+      } md:gap-20 items-start md:items-center md:px-4`}
     >
       {/* Card information */}
       <CardSideInformation
@@ -41,7 +41,7 @@ const CodeSection = ({
         secondaryButton={secondaryButton}
       />
       {/* Code section */}
-      <div className="w-[50%] min-h-fit flex gap-[2px] relative">
+      <div className="lg:w-[50%] min-h-fit flex gap-[2px] relative">
         {/* gradient */}
         <div
           className={`w-[372.95px] h-[257.05px] opacity-20 z-10 absolute left-0 top-1

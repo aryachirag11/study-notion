@@ -24,8 +24,8 @@ const ExploreMore = () => {
   console.log(" currentCard: ", currentCard);
 
   return (
-    <div className="flex flex-col items-center gap-10">
-      <div className="max-w-max h-fit px-6 py-[6px] rounded-full xl text-base flex items-center gap-8 bg-richblack-800 text-richblack-400 ">
+    <div className="md:h-full flex flex-col items-center gap-10">
+      <div className="max-w-max h-fit mx-4 px-4 md:px-6 py-1 md:py-[6px] rounded-xl md:rounded-full xl text-base flex items-center gap-4 md:gap-8 bg-richblack-800 text-richblack-400 ">
         {tabsName.map((tag, index) => (
           <button
             key={index}
@@ -40,7 +40,7 @@ const ExploreMore = () => {
           </button>
         ))}
       </div>
-      <div className="max-w-[1096px] h-[300px] flex gap-9">
+      <div className="md:max-w-[1096px] h-[260px] md:h-[300px]  flex flex-col items-center md:flex-row gap-6 md:gap-9">
         {taggedCourses.map((course, index) => (
           <ExploreCard
             key={index}
