@@ -19,9 +19,9 @@ const ExploreMore = () => {
     setTaggedCourses(currentTagCourses[0].courses);
     setcurrentCard(currentTagCourses[0].courses[0].heading);
   };
-  console.log(" currentTab: ", currentTab);
-  console.log("taggedCourses : ", taggedCourses);
-  console.log(" currentCard: ", currentCard);
+  // console.log(" currentTab: ", currentTab);
+  // console.log("taggedCourses : ", taggedCourses);
+  // console.log(" currentCard: ", currentCard);
 
   return (
     <div className="md:h-full flex flex-col items-center gap-10">
