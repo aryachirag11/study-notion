@@ -83,7 +83,8 @@ exports.userSignup = async (req, res) => {
       !email ||
       !password ||
       !confirmPassword ||
-      !otp
+      !otp ||
+      !accountType
     ) {
       return res.status(403).josn({
         success: false,
