@@ -2,9 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
 
-const CTAButton = ({ isActive, changeText, linkTo, trailingIcon }) => {
+const CTAButton = ({ isActive, changeText, linkTo, trailingIcon, type }) => {
   return (
-    <>
+    <button type={type}>
       <Link
         to={linkTo}
         className={`w-fit max-h-12 rounded-lg px-6 py-3 ${
@@ -16,7 +16,7 @@ const CTAButton = ({ isActive, changeText, linkTo, trailingIcon }) => {
         {changeText}
         {trailingIcon && <FaArrowRight height="16px" width="16px" />}
       </Link>
-    </>
+    </button>
   );
 };
 
