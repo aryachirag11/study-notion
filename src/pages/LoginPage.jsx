@@ -1,6 +1,6 @@
 import React from "react";
 import LoginImage from "../assets/Images/login.webp";
-import Template from "./../components/Form/Template";
+import Template from "./../components/core/Auth/Template";
 
 const LoginPage = () => {
   return (

@@ -1,6 +1,6 @@
 import React from "react";
 import signupImg from "../assets/Images/signup.webp";
-import Template from "./../components/Form/Template";
+import Template from "./../components/core/Auth/Template";
 
 const SignupPage = () => {
   return (
